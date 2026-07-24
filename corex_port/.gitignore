@@ -1,0 +1,8 @@
+# Local-only large raw logs and probe build artifacts (noted in manifest.local_logs)
+build/test_cuda_full.log
+build/test_cpu_baseline.log
+probe/bin/
+probe/obj/
+probe/driver_probe
+probe/ctx_probe
+probe/ptx_load_probe

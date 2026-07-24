@@ -240,10 +240,24 @@ namespace ILGPU.Runtime.Cuda
             if (ArchitectureLookup.TryGetValue(architecture, out var result))
                 return result;
 
-            // If the architecture is unknown, return the highest driver version that
-            // we support. The user should already have a driver version higher than
-            // this, because they are most likely using a brand new graphics card.
-            return ArchitectureLookup.OrderByDescending(x => x.Key).First().Value;
+            // Unknown architecture. Some CUDA-compatible vendor GPUs report a compute
+            // capability that is not an exact NVIDIA SM version (for example the
+            // Iluvatar CoreX ivcore11 BI-V150 reports compute capability 7.1, which is
+            // not one of the canonical NVIDIA SM_70 / SM_72 values). In that case fall
+            // back to the closest known architecture that is less than or equal to the
+            // requested one: its feature set is a subset, so its minimum driver version
+            // is a safe lower bound. This avoids demanding the driver version of the
+            // newest known architecture for a device that is in reality older.
+            var lowerOrEqual = ArchitectureLookup
+                .Where(x => x.Key <= architecture)
+                .OrderByDescending(x => x.Key)
+                .Select(x => x.Value)
+                .ToArray();
+            if (lowerOrEqual.Length > 0)
+                return lowerOrEqual[0];
+
+            // Older than everything we know about: use the lowest known version.
+            return ArchitectureLookup.OrderBy(x => x.Key).First().Value;
         }
 
         /// <summary>

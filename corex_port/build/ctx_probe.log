@@ -1,0 +1,3 @@
+cuInit rc=0
+cuDeviceGet rc=0 dev=0
+calling cuCtxCreate_v2(flags=0) ...

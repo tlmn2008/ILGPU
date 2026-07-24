@@ -1,0 +1,52 @@
+{
+  "repo_name": "ILGPU",
+  "repo_url": "https://github.com/m4rs-mt/ILGPU.git",
+  "source_commit": "ea51bcbdc3695554b8b9899a225d37c12cd0babe",
+  "source_commit_date": "2026-04-16T22:01:24+01:00",
+  "source_branch": "master",
+  "migration_started_at": "2026-07-25T03:08:00+08:00",
+  "migration_finished_at": "2026-07-25T07:00:00+08:00",
+  "sdk_version": "/usr/local/corex (ivcore11, clang++ frontend, CUDA driver 10.2); .NET SDK 8.0.423 (user-space)",
+  "skill_version": "corex-cuda-compatible-migration",
+
+  "compile_status": "success",
+  "test_status": "partial_pass",
+  "overall_status": "blocked",
+
+  "tests_run": 37999,
+  "tests_passed": 186,
+  "tests_failed": 37795,
+  "tests_skipped": 18,
+
+  "summary": "ILGPU 是 C#/.NET 的 GPU JIT 编译器，其 CUDA 后端把 IL 编译为 NVIDIA 风格 PTX 文本、经 driver API cuModuleLoadData 运行时 JIT 加载执行（仓库无 nvcc/.cu）。.NET 构建（dotnet build ILGPU.sln -c Release）在 CoreX 上完全成功（0 error/0 warning）。经两处仓库内适配后，ILGPU 已能在 ivcore11 上识别 2×BI-V150、创建 CUDA 上下文并生成 PTX；但 CoreX ivcore11 驱动不消费 NVIDIA PTX 文本——cuModuleLoadData 对任意 target/version 的 NV PTX 均返回 CUDA_ERROR_INVALID_IMAGE(200)（已用裸 C 复现），导致所有需要 launch kernel 的 CUDA 用例失败。CUDA 套件 37999 例：186 通过（非 kernel 用例）/37795 失败/18 跳过；CPU 加速器基线套件 21127 例 20920 通过/0 失败/207 跳过，证明构建与库本体健康、问题被隔离到 GPU PTX 路径。该 PTX 拒绝为 terminal（红线禁改驱动，绕过需为 ILGPU 新增 ivcore11 原生后端，超出仓库局部适配范围），故 overall_status=blocked。",
+  "key_adaptations": [
+    "CudaDriverVersion.cs：未知架构（CoreX 上报 cc 7.1 = SM_71，不在 ILGPU 架构表）的最低驱动版本回退逻辑改为「回退到 ≤ 该架构的最近已知架构」（SM_71→SM_70→CUDA 9.0），使其在 CUDA 10.2 驱动上选出 PTX ISA_65，从而正确识别设备（原逻辑回退到最新架构=CUDA 12.x，导致设备被 predicate 拒绝、枚举得 0 卡）",
+    "Context.Builder.cs：LibDevice 自动探测健壮化，对 CoreX 缺失的 nvvm/lib64 与 nvvm/libdevice 目录做 Directory.Exists 判空后按 throwIfNotFound 语义优雅跳过（原代码 Directory.EnumerateFiles 对缺失目录抛未捕获异常使 Context.Create 崩溃；默认 PTX 后端不依赖 NVVM/LibDevice）",
+    "运行规程：每次 GPU-heavy 运行前 ixsmi -r，规避 CoreX 驱动状态残留导致的 cuCtxCreate 挂死",
+    "用户态安装 .NET 8 SDK（global.json 要求 8.0）到 /root/.dotnet，未污染系统、zero-touch /usr/local/corex"
+  ],
+  "terminal_blockers": [
+    "CoreX ivcore11 驱动拒绝 NVIDIA 风格 PTX：ILGPU 生成 .target sm_71/.version 6.5 的 PTX，cuModuleLoadData/cuModuleLoadDataEx 返回 CUDA_ERROR_INVALID_IMAGE(200)、JIT log 空白。裸 C 复现覆盖改 target 到 sm_70、手写最小 PTX（version 6.0/6.5/7.0 × target sm_62/70/72）全部 rc=200。ivcore11 设备镜像由 clang -x ivcore 产出、驱动 JIT 不消费 NV PTX 文本；ILGPU 整个 CUDA 后端架构即「生成 NV PTX→驱动 JIT」，绕过需新增 ivcore11 原生后端（受红线 zero-touch SDK 约束、超出仓库局部适配范围），判定 terminal"
+  ],
+  "workaround_blockers": [
+    "未知 compute capability 7.1 致设备枚举得 0：改 GetMinimumDriverVersion 未知架构回退逻辑后解决，设备被识别为 ISA 6.5 / warpSize 64",
+    "LibDevice 自动探测在 CoreX 部分 nvvm 目录布局下抛 DirectoryNotFoundException 崩溃：加目录判空后解决",
+    "驱动状态残留致 cuCtxCreate_v2 挂死数分钟：每次运行前 ixsmi -r，复位后 0.01s 成功、测试套件 fail-fast 无挂死"
+  ],
+
+  "github": {
+    "fork_url": "https://github.com/tlmn2008/ILGPU",
+    "branch": "corex-port",
+    "default_branch": "corex-port",
+    "default_branch_status": "not_attempted",
+    "compare_url": "https://github.com/tlmn2008/ILGPU/compare/master...corex-port",
+    "push_commit": "",
+    "push_status": "pending",
+    "pushed_at": ""
+  },
+
+  "local_logs": {
+    "compile_log": "/home/repos/ILGPU/corex_port/build/compile.log (== dotnet_build_final.log; kept local per SOP)",
+    "test_log": "/home/repos/ILGPU/corex_port/test/test.log (condensed CUDA suite, all 37999 outcomes; full raw local: /home/repos/ILGPU/corex_port/build/test_cuda_full.log ~96MB)"
+  }
+}

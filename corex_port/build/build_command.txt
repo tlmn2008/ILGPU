@@ -1,0 +1,29 @@
+# ILGPU on CoreX ivcore11 — build & test commands (all zero-touch /usr/local/corex)
+
+## Environment
+source /home/init_container.sh
+# .NET 8 SDK (installed user-space; global.json requires 8.0)
+export DOTNET_ROOT=/root/.dotnet
+export PATH=$PATH:/root/.dotnet
+export DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1
+export LD_LIBRARY_PATH=/usr/local/corex/lib:/usr/local/corex/lib64:$LD_LIBRARY_PATH
+export CUDA_HOME=/usr/local/corex
+
+## .NET build (the "compile" surface — SUCCESS)
+cd Src
+dotnet build ILGPU.sln -c Release      # -> corex_port/build/dotnet_build_final.log (0 error / 0 warning)
+
+## Runtime tests (must run OUTSIDE sandbox; reset driver first)
+ixsmi -r
+dotnet test ILGPU.Tests.Cuda/ILGPU.Tests.Cuda.csproj -c Release --no-build   # PRIMARY: CUDA suite (migration target)
+dotnet test ILGPU.Tests.CPU/ILGPU.Tests.CPU.csproj   -c Release --no-build   # BASELINE: CPU accelerator suite
+
+## Raw-driver reproductions of the terminal PTX wall (corex_port/probe/)
+clang driver_probe.c    -o driver_probe    -ldl   # cuInit / device enum
+clang ctx_probe.c       -o ctx_probe        -ldl   # cuCtxCreate (residue hang demo)
+clang ptx_load_probe.c  -o ptx_load_probe   -ldl   # cuModuleLoadData on NV PTX -> rc=200
+./ptx_load_probe corex_port/build/ilgpu_generated.ptx
+
+## SDK note
+.NET SDK 8.0.423 installed to /root/.dotnet via https://dot.net/v1/dotnet-install.sh --channel 8.0
+CoreX SDK: /usr/local/corex (clang++ frontend, ivcore11), CUDA driver 10.2, 2x BI-V150.

@@ -1,0 +1,48 @@
+  Determining projects to restore...
+  Restored /home/repos/ILGPU/Src/ILGPU.Analyzers/ILGPU.Analyzers.csproj (in 2.25 min).
+  Restored /home/repos/ILGPU/Src/ILGPU/ILGPU.csproj (in 2.24 min).
+  Restored /home/repos/ILGPU/Src/ILGPU.Algorithms/ILGPU.Algorithms.csproj (in 2.24 min).
+  Restored /home/repos/ILGPU/Src/ILGPU.Tests/ILGPU.Tests.csproj (in 4.14 min).
+  Restored /home/repos/ILGPU/Src/ILGPU.Algorithms.Tests.OpenCL/ILGPU.Algorithms.Tests.OpenCL.csproj (in 4.14 min).
+  Restored /home/repos/ILGPU/Src/ILGPU.Tests.CPU/ILGPU.Tests.CPU.csproj (in 4.14 min).
+  Restored /home/repos/ILGPU/Src/ILGPU.Tests.OpenCL/ILGPU.Tests.OpenCL.csproj (in 4.14 min).
+  Restored /home/repos/ILGPU/Src/ILGPU.Tests.Velocity/ILGPU.Tests.Velocity.csproj (in 4.14 min).
+  Restored /home/repos/ILGPU/Src/ILGPU.Tests.Cuda/ILGPU.Tests.Cuda.csproj (in 4.14 min).
+  Restored /home/repos/ILGPU/Src/ILGPU.Tests.Velocity128/ILGPU.Tests.Velocity128.csproj (in 4.14 min).
+  Restored /home/repos/ILGPU/Src/ILGPU.Algorithms.Tests/ILGPU.Algorithms.Tests.csproj (in 4.14 min).
+  Restored /home/repos/ILGPU/Src/ILGPU.Algorithms.Tests.Cuda/ILGPU.Algorithms.Tests.Cuda.csproj (in 4.14 min).
+  Restored /home/repos/ILGPU/Src/ILGPU.Algorithms.Tests.CPU/ILGPU.Algorithms.Tests.CPU.csproj (in 4.14 min).
+  Restored /home/repos/ILGPU/Src/ILGPU.Analyzers.Tests/ILGPU.Analyzers.Tests.csproj (in 4.34 min).
+  Restored /home/repos/ILGPU/Src/ILGPU.Tests/ILGPU.Tests.csproj (in 14.32 min).
+  Templates transformed for ILGPU.Algorithms.Tests.CPU (in 1.266 sec).
+  Templates transformed for ILGPU.Algorithms.Tests.OpenCL (in 1.348 sec).
+  Templates transformed for ILGPU.Algorithms.Tests.Cuda (in 1.313 sec).
+  Templates transformed for ILGPU.Tests.Cuda (in 1.319 sec).
+  Templates transformed for ILGPU.Tests.Velocity (in 1.416 sec).
+  Templates transformed for ILGPU.Tests.Velocity128 (in 1.425 sec).
+  Templates transformed for ILGPU.Tests.CPU (in 1.487 sec).
+  Templates transformed for ILGPU.Tests.OpenCL (in 1.46 sec).
+  ILGPU.Analyzers -> /home/repos/ILGPU/Src/ILGPU.Analyzers/bin/Release/netstandard2.0/ILGPU.Analyzers.dll
+  Templates transformed for ILGPU.Tests (in 2.869 sec).
+  Templates transformed for ILGPU.Algorithms.Tests (in 3.582 sec).
+  Templates transformed for ILGPU.Algorithms (in 4.61 sec).
+  Templates transformed for ILGPU (in 5.454 sec).
+  ILGPU -> /home/repos/ILGPU/Bin/Release/net8.0/ILGPU.dll
+  ILGPU.Analyzers.Tests -> /home/repos/ILGPU/Src/ILGPU.Analyzers.Tests/bin/Release/net8.0/ILGPU.Analyzers.Tests.dll
+  ILGPU.Tests -> /home/repos/ILGPU/Src/ILGPU.Tests/bin/Release/net8.0/ILGPU.Tests.dll
+  ILGPU.Tests.OpenCL -> /home/repos/ILGPU/Src/ILGPU.Tests.OpenCL/bin/Release/net8.0/ILGPU.Tests.OpenCL.dll
+  ILGPU.Tests.Cuda -> /home/repos/ILGPU/Src/ILGPU.Tests.Cuda/bin/Release/net8.0/ILGPU.Tests.Cuda.dll
+  ILGPU.Tests.CPU -> /home/repos/ILGPU/Src/ILGPU.Tests.CPU/bin/Release/net8.0/ILGPU.Tests.CPU.dll
+  ILGPU.Tests.Velocity -> /home/repos/ILGPU/Src/ILGPU.Tests.Velocity/bin/Release/net8.0/ILGPU.Tests.Velocity.dll
+  ILGPU.Tests.Velocity128 -> /home/repos/ILGPU/Src/ILGPU.Tests.Velocity128/bin/Release/net8.0/ILGPU.Tests.Velocity128.dll
+  ILGPU.Algorithms -> /home/repos/ILGPU/Bin/Release/net8.0/ILGPU.Algorithms.dll
+  ILGPU.Algorithms.Tests -> /home/repos/ILGPU/Src/ILGPU.Algorithms.Tests/bin/Release/net8.0/ILGPU.Algorithms.Tests.dll
+  ILGPU.Algorithms.Tests.Cuda -> /home/repos/ILGPU/Src/ILGPU.Algorithms.Tests.Cuda/bin/Release/net8.0/ILGPU.Algorithms.Tests.Cuda.dll
+  ILGPU.Algorithms.Tests.OpenCL -> /home/repos/ILGPU/Src/ILGPU.Algorithms.Tests.OpenCL/bin/Release/net8.0/ILGPU.Algorithms.Tests.OpenCL.dll
+  ILGPU.Algorithms.Tests.CPU -> /home/repos/ILGPU/Src/ILGPU.Algorithms.Tests.CPU/bin/Release/net8.0/ILGPU.Algorithms.Tests.CPU.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:14:53.63

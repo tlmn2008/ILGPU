@@ -1,0 +1,14 @@
+cuInit=0
+cuCtxCreate rc=0
+[ILGPU-sm_71] cuModuleLoadDataEx rc=200 mod=(nil)
+[ILGPU-sm_71] cuModuleLoadData rc=200 mod=(nil)
+[ILGPU-sm_70] cuModuleLoadDataEx rc=200 mod=(nil)
+[ILGPU-sm_70] cuModuleLoadData rc=200 mod=(nil)
+[mini-6.5-sm70] cuModuleLoadDataEx rc=200 mod=(nil)
+[mini-6.5-sm70] cuModuleLoadData rc=200 mod=(nil)
+[mini-6.0-sm70] cuModuleLoadDataEx rc=200 mod=(nil)
+[mini-6.0-sm70] cuModuleLoadData rc=200 mod=(nil)
+[mini-7.0-sm72] cuModuleLoadDataEx rc=200 mod=(nil)
+[mini-7.0-sm72] cuModuleLoadData rc=200 mod=(nil)
+[mini-6.5-sm62] cuModuleLoadDataEx rc=200 mod=(nil)
+[mini-6.5-sm62] cuModuleLoadData rc=200 mod=(nil)

@@ -1,0 +1,7 @@
+libcuda.so loaded OK
+cuInit=0x744beb264790 count=0x744beb25f490 ver=0x744beb2600b0 cc=0x744beb25f210
+cuInit(0) rc=0
+cuDriverGetVersion rc=0 version=10020
+cuDeviceGetCount rc=0 n=2
+  dev 0 get_rc=0 name='Iluvatar BI-V150' attrCC=7.1 computeCap_rc=0 cc=7.1
+  dev 1 get_rc=0 name='Iluvatar BI-V150' attrCC=7.1 computeCap_rc=0 cc=7.1

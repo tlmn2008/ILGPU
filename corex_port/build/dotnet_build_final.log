@@ -1,0 +1,22 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  ILGPU.Analyzers -> /home/repos/ILGPU/Src/ILGPU.Analyzers/bin/Release/netstandard2.0/ILGPU.Analyzers.dll
+  ILGPU -> /home/repos/ILGPU/Bin/Release/net8.0/ILGPU.dll
+  ILGPU.Analyzers.Tests -> /home/repos/ILGPU/Src/ILGPU.Analyzers.Tests/bin/Release/net8.0/ILGPU.Analyzers.Tests.dll
+  ILGPU.Tests -> /home/repos/ILGPU/Src/ILGPU.Tests/bin/Release/net8.0/ILGPU.Tests.dll
+  ILGPU.Tests.Velocity128 -> /home/repos/ILGPU/Src/ILGPU.Tests.Velocity128/bin/Release/net8.0/ILGPU.Tests.Velocity128.dll
+  ILGPU.Tests.OpenCL -> /home/repos/ILGPU/Src/ILGPU.Tests.OpenCL/bin/Release/net8.0/ILGPU.Tests.OpenCL.dll
+  ILGPU.Tests.Cuda -> /home/repos/ILGPU/Src/ILGPU.Tests.Cuda/bin/Release/net8.0/ILGPU.Tests.Cuda.dll
+  ILGPU.Tests.CPU -> /home/repos/ILGPU/Src/ILGPU.Tests.CPU/bin/Release/net8.0/ILGPU.Tests.CPU.dll
+  ILGPU.Tests.Velocity -> /home/repos/ILGPU/Src/ILGPU.Tests.Velocity/bin/Release/net8.0/ILGPU.Tests.Velocity.dll
+  ILGPU.Algorithms -> /home/repos/ILGPU/Bin/Release/net8.0/ILGPU.Algorithms.dll
+  ILGPU.Algorithms.Tests -> /home/repos/ILGPU/Src/ILGPU.Algorithms.Tests/bin/Release/net8.0/ILGPU.Algorithms.Tests.dll
+  ILGPU.Algorithms.Tests.Cuda -> /home/repos/ILGPU/Src/ILGPU.Algorithms.Tests.Cuda/bin/Release/net8.0/ILGPU.Algorithms.Tests.Cuda.dll
+  ILGPU.Algorithms.Tests.OpenCL -> /home/repos/ILGPU/Src/ILGPU.Algorithms.Tests.OpenCL/bin/Release/net8.0/ILGPU.Algorithms.Tests.OpenCL.dll
+  ILGPU.Algorithms.Tests.CPU -> /home/repos/ILGPU/Src/ILGPU.Algorithms.Tests.CPU/bin/Release/net8.0/ILGPU.Algorithms.Tests.CPU.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:23.70

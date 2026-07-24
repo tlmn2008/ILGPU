@@ -358,6 +358,18 @@ namespace ILGPU
                     RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? "nvvm64*.dll"
                     : "libnvvm*.so";
+                // Some CUDA-compatible SDKs (e.g. Iluvatar CoreX) ship a partial nvvm
+                // layout that does not contain the expected bin/lib64 directory. Guard
+                // against a missing directory so that auto-detection can gracefully skip
+                // (throwing only when the caller explicitly requested LibDevice).
+                if (!Directory.Exists(nvvmBinDir))
+                {
+                    return throwIfNotFound
+                    ? throw new NotSupportedException(string.Format(
+                        RuntimeErrorMessages.NotSupportedLibDeviceNotFoundNvvmDll,
+                        nvvmBinDir))
+                    : this;
+                }
                 var nvvmFiles = Directory.EnumerateFiles(nvvmBinDir, nvvmSearchPattern);
                 var libNvvmPath = nvvmFiles.FirstOrDefault();
                 if (libNvvmPath is null)
@@ -371,6 +383,14 @@ namespace ILGPU
 
                 // Find the LibDevice Bitcode.
                 var libDeviceDir = Path.Combine(nvvmRoot, "libdevice");
+                if (!Directory.Exists(libDeviceDir))
+                {
+                    return throwIfNotFound
+                    ? throw new NotSupportedException(string.Format(
+                        RuntimeErrorMessages.NotSupportedLibDeviceNotFoundBitCode,
+                        libDeviceDir))
+                    : this;
+                }
                 var libDeviceFiles = Directory.EnumerateFiles(
                     libDeviceDir,
                     "libdevice.*.bc");

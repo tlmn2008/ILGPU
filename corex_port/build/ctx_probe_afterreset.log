@@ -1,0 +1,5 @@
+cuInit rc=0
+cuDeviceGet rc=0 dev=0
+calling cuCtxCreate_v2(flags=0) ...
+cuCtxCreate_v2 rc=0 ctx=0x559ec36899d0 took=0.01s
+cuCtxDestroy rc=0
