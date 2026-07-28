@@ -31,9 +31,8 @@
     "驱动状态残留致 cuCtxCreate_v2 挂死数分钟：每次运行前 ixsmi -r，复位后 0.01s 成功、测试套件 fail-fast 无挂死"
   ],
   "upstream_assessment": {
-    "upstreamable": "yes",
-    "nvidia_compatible": "preserved",
-    "notes": "两处改动均为与 CoreX 无关的通用健壮性/正确性修复:CudaDriverVersion 未知架构回退逻辑、Context.Builder LibDevice 目录缺失崩溃;NVIDIA 已知架构行为不变，可直接提 PR。CUDA 后端在 ivcore11 因驱动拒绝 NV PTX 文本(terminal)无法执行 kernel，需为 ILGPU 新增 ivcore11 原生后端方能运行(超出局部适配)。CLA 需签。"
+    "upstream_status": "blocked",
+    "notes": "CoreX CUDA 后端在 ivcore11 因驱动拒收 NV PTX 文本(200)无法加载 kernel,需为 ILGPU 新增 ivcore11 原生后端(超出局部适配、受 zero-touch SDK 红线约束)才能跑通——terminal,CoreX 适配无可用后端可上游。但两处改动(CudaDriverVersion 未知架构回退、Context.Builder LibDevice 目录缺失崩溃)是与 CoreX 无关的通用健壮性修复,NVIDIA 行为不变,已留在 bugfixes[] 可直接单独提 PR。CLA 需签。"
   },
   "bugfixes": [
     {
