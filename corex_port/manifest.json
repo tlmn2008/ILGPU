@@ -8,16 +8,13 @@
   "migration_finished_at": "2026-07-25T07:00:00+08:00",
   "sdk_version": "/usr/local/corex (ivcore11, clang++ frontend, CUDA driver 10.2); .NET SDK 8.0.423 (user-space)",
   "skill_version": "corex-cuda-compatible-migration",
-
   "compile_status": "success",
   "test_status": "partial_pass",
   "overall_status": "blocked",
-
   "tests_run": 37999,
   "tests_passed": 186,
   "tests_failed": 37795,
   "tests_skipped": 18,
-
   "summary": "ILGPU 是 C#/.NET 的 GPU JIT 编译器，其 CUDA 后端把 IL 编译为 NVIDIA 风格 PTX 文本、经 driver API cuModuleLoadData 运行时 JIT 加载执行（仓库无 nvcc/.cu）。.NET 构建（dotnet build ILGPU.sln -c Release）在 CoreX 上完全成功（0 error/0 warning）。经两处仓库内适配后，ILGPU 已能在 ivcore11 上识别 2×BI-V150、创建 CUDA 上下文并生成 PTX；但 CoreX ivcore11 驱动不消费 NVIDIA PTX 文本——cuModuleLoadData 对任意 target/version 的 NV PTX 均返回 CUDA_ERROR_INVALID_IMAGE(200)（已用裸 C 复现），导致所有需要 launch kernel 的 CUDA 用例失败。CUDA 套件 37999 例：186 通过（非 kernel 用例）/37795 失败/18 跳过；CPU 加速器基线套件 21127 例 20920 通过/0 失败/207 跳过，证明构建与库本体健康、问题被隔离到 GPU PTX 路径。该 PTX 拒绝为 terminal（红线禁改驱动，绕过需为 ILGPU 新增 ivcore11 原生后端，超出仓库局部适配范围），故 overall_status=blocked。",
   "key_adaptations": [
     "CudaDriverVersion.cs：未知架构（CoreX 上报 cc 7.1 = SM_71，不在 ILGPU 架构表）的最低驱动版本回退逻辑改为「回退到 ≤ 该架构的最近已知架构」（SM_71→SM_70→CUDA 9.0），使其在 CUDA 10.2 驱动上选出 PTX ISA_65，从而正确识别设备（原逻辑回退到最新架构=CUDA 12.x，导致设备被 predicate 拒绝、枚举得 0 卡）",
@@ -33,7 +30,25 @@
     "LibDevice 自动探测在 CoreX 部分 nvvm 目录布局下抛 DirectoryNotFoundException 崩溃：加目录判空后解决",
     "驱动状态残留致 cuCtxCreate_v2 挂死数分钟：每次运行前 ixsmi -r，复位后 0.01s 成功、测试套件 fail-fast 无挂死"
   ],
-
+  "upstream_assessment": {
+    "upstreamable": "yes",
+    "nvidia_compatible": "preserved",
+    "notes": "两处改动均为与 CoreX 无关的通用健壮性/正确性修复:CudaDriverVersion 未知架构回退逻辑、Context.Builder LibDevice 目录缺失崩溃;NVIDIA 已知架构行为不变，可直接提 PR。CUDA 后端在 ivcore11 因驱动拒绝 NV PTX 文本(terminal)无法执行 kernel，需为 ILGPU 新增 ivcore11 原生后端方能运行(超出局部适配)。CLA 需签。"
+  },
+  "bugfixes": [
+    {
+      "file": "Src/ILGPU/Runtime/Cuda/CudaDriverVersion.cs",
+      "description": "GetMinimumDriverVersion 对未知架构回退到最新已知架构的最低驱动版本，导致上报 cc7.1 的设备在旧驱动上选不出 PTX ISA 而枚举得 0 卡;改为回退到 ≤该架构的最近已知架构。属未知架构回退逻辑缺陷，通用有益。",
+      "upstream_worthy": true,
+      "status": "fixed_local"
+    },
+    {
+      "file": "Src/ILGPU/Context.Builder.cs",
+      "description": "LibDevice 自动探测对缺失目录调用 Directory.EnumerateFiles 抛未捕获 DirectoryNotFoundException 致 Context.Create 崩溃;加 Directory.Exists 判空后按 throwIfNotFound 优雅跳过。属未捕获异常缺陷。",
+      "upstream_worthy": true,
+      "status": "fixed_local"
+    }
+  ],
   "github": {
     "fork_url": "https://github.com/tlmn2008/ILGPU",
     "branch": "corex-port",
@@ -44,7 +59,6 @@
     "push_status": "success",
     "pushed_at": "2026-07-25T07:05:00+08:00"
   },
-
   "local_logs": {
     "compile_log": "/home/repos/ILGPU/corex_port/build/compile.log (== dotnet_build_final.log; kept local per SOP)",
     "test_log": "/home/repos/ILGPU/corex_port/test/test.log (condensed CUDA suite, all 37999 outcomes; full raw local: /home/repos/ILGPU/corex_port/build/test_cuda_full.log ~96MB)"
