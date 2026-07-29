@@ -1,12 +1,13 @@
 {
+  "schema_version": "1.0",
   "repo": "ILGPU",
   "blockers": [
     {
       "id": "corex-driver-rejects-nv-ptx",
-      "title": "CoreX ivcore11 驱动拒绝 NVIDIA 风格 PTX (cuModuleLoadData -> CUDA_ERROR_INVALID_IMAGE 200)",
-      "classification": "terminal",
-      "component": "ILGPU CUDA backend (PTXBackend) + CoreX libcuda 驱动 JIT",
       "symptom": "ILGPU 的 PTXBackend 把 IL 编译为 NVIDIA 风格 PTX 文本 (.version 6.5 / .target sm_71)，再经 driver API cuModuleLoadData 做 JIT 加载。CoreX ivcore11 驱动返回 CUDA_ERROR_INVALID_IMAGE(200)，JIT error log 为空白。",
+      "classification": "terminal",
+      "resolved": false,
+      "final_verdict": "CoreX ivcore11 的设备代码路径是 clang -x ivcore 产出 ivcore11 原生镜像，驱动 JIT 不消费 NVIDIA PTX 文本(任何 target/version 均拒绝)。ILGPU 的整个 CUDA 后端从架构上就是 '生成 NV PTX -> 驱动 JIT'，要在 ivcore11 上跑 kernel 必须新增一个产出 ivcore11 原生镜像的全新后端(接入 CoreX clang 工具链)，这不是仓库内的局部适配所能解决，且受限于 CoreX 未对该 '喂入可加载镜像' 流程开放的能力。红线要求 zero-touch /usr/local/corex，无法改驱动。故判定 terminal。",
       "evidence": [
         "corex_port/build/probe_final.log: ILGPU LoadKernel FAILED: CudaException 'device kernel image is invalid at kernelLoaded'",
         "corex_port/build/ilgpu_generated.ptx: ILGPU 实际产出的 PTX(.target sm_71, .version 6.5)",
@@ -18,55 +19,44 @@
         "手写零依赖最小 PTX(空 kernel) 覆盖 .version 6.0/6.5/7.0 与 .target sm_62/sm_70/sm_72，逐一 cuModuleLoadDataEx —— 全部 rc=200",
         "同时验证 cuModuleLoadData 与 cuModuleLoadDataEx 两条入口 —— 结果一致",
         "对照 iluvatar-cuda-base 兼容索引确认为已知平台边界：'cuModuleLoad(NV PTX) 拒绝 … ivcore11 后端不消费 NV PTX 文本'"
-      ],
-      "why_terminal": "CoreX ivcore11 的设备代码路径是 clang -x ivcore 产出 ivcore11 原生镜像，驱动 JIT 不消费 NVIDIA PTX 文本(任何 target/version 均拒绝)。ILGPU 的整个 CUDA 后端从架构上就是 '生成 NV PTX -> 驱动 JIT'，要在 ivcore11 上跑 kernel 必须新增一个产出 ivcore11 原生镜像的全新后端(接入 CoreX clang 工具链)，这不是仓库内的局部适配所能解决，且受限于 CoreX 未对该 '喂入可加载镜像' 流程开放的能力。红线要求 zero-touch /usr/local/corex，无法改驱动。故判定 terminal。",
-      "resolved": false
+      ]
     },
     {
       "id": "unknown-arch-cc71-rejected",
-      "title": "ILGPU 因未知 compute capability 7.1 拒绝 CoreX 设备(设备枚举得 0)",
-      "classification": "workaround-able",
-      "component": "ILGPU CudaDriverVersionUtils.GetMinimumDriverVersion / 设备 predicate",
       "symptom": "BI-V150 上报 cc 7.1(SM_71)，不在 ILGPU 架构表(只有 SM_70/SM_72)。未知架构回退逻辑返回 '最高已知架构' 的最低驱动版本(CUDA 12.x)，而设备驱动是 CUDA 10.2，导致选不出 PTX ISA -> InstructionSet 为空 -> 默认 predicate 拒绝 -> GetCudaDevices() 返回 0，异常被静默吞掉。",
+      "classification": "workaround-able",
+      "resolved": true,
       "evidence": [
         "初次 probe: 'Total CUDA devices: 0'；插桩后见 device arch=SM_71 isa=(empty) predicate=False"
       ],
       "attempts": [
         "修改 CudaDriverVersion.cs GetMinimumDriverVersion(architecture)：未知架构改为回退到 '<= 该架构的最近已知架构'(SM_71 -> SM_70 -> CUDA 9.0)，使其能在 CUDA 10.2 驱动上选出 ISA_65。修改后设备被正确识别(2 卡, ISA 6.5, warpSize 64)。"
-      ],
-      "why_terminal": null,
-      "resolved": true
+      ]
     },
     {
       "id": "libdevice-partial-nvvm-layout-crash",
-      "title": "ILGPU LibDevice 自动探测在 CoreX 部分 nvvm 目录布局下崩溃",
-      "classification": "workaround-able",
-      "component": "ILGPU Context.Builder.LibDevice",
       "symptom": "builder.Cuda() 自动调用 LibDevice(throwIfNotFound:false)。CoreX 有 /usr/local/corex/nvvm/libdevice 但无 nvvm/lib64，Directory.EnumerateFiles 对不存在目录抛 DirectoryNotFoundException(即便 throwIfNotFound=false 也未被拦)，Context.Create 直接崩溃。",
+      "classification": "workaround-able",
+      "resolved": true,
       "evidence": [
         "corex_port/build/probe_run.log(早期): DirectoryNotFoundException '/usr/local/corex/nvvm/lib64' at Context.Builder.LibDevice line 361"
       ],
       "attempts": [
         "修改 Context.Builder.cs LibDevice：在枚举前对 nvvmBinDir 与 libDeviceDir 做 Directory.Exists 判空，缺失时按 throwIfNotFound 语义优雅返回(不再抛未捕获异常)。修改后 CUDA_HOME 指向 corex 也能正常 Context.Create。ILGPU 默认 PTX 后端不依赖 NVVM/LibDevice，跳过它不影响 kernel 生成。"
-      ],
-      "why_terminal": null,
-      "resolved": true
+      ]
     },
     {
       "id": "driver-residue-cuctxcreate-hang",
-      "title": "驱动状态残留导致 cuCtxCreate 挂死数分钟",
-      "classification": "workaround-able",
-      "component": "CoreX libcuda 驱动状态机",
       "symptom": "前一进程异常(被 kill -9)后，下一次 cuCtxCreate_v2(flags=0) 在主线程 nanosleep 中永久挂死，GPU-Util 0%。",
+      "classification": "workaround-able",
+      "resolved": true,
       "evidence": [
         "corex_port/build/ctx_probe.log: cuCtxCreate 90s 超时(EXIT=124)",
         "corex_port/build/ctx_probe_afterreset.log: 'ixsmi -r' 后 cuCtxCreate rc=0 took=0.01s"
       ],
       "attempts": [
         "按 iluvatar-cuda-base/driver-residue 约定，在每次 GPU-heavy 运行前无条件 'ixsmi -r'。复位后 cuCtxCreate 立即成功，测试套件 fail-fast 无挂死。"
-      ],
-      "why_terminal": null,
-      "resolved": true
+      ]
     }
   ]
 }
