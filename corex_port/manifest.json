@@ -6,7 +6,7 @@
   "source_branch": "master",
   "migration_started_at": "2026-07-25T03:08:00+08:00",
   "migration_finished_at": "2026-07-25T07:00:00+08:00",
-  "sdk_version": "/usr/local/corex (ivcore11, clang++ frontend, CUDA driver 10.2); .NET SDK 8.0.423 (user-space)",
+  "sdk_version": "CoreX 4.5.0.20260630",
   "skill_version": "corex-cuda-compatible-migration",
   "compile_status": "success",
   "test_status": "partial_pass",
