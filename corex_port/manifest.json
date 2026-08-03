@@ -22,14 +22,6 @@
     "运行规程：每次 GPU-heavy 运行前 ixsmi -r，规避 CoreX 驱动状态残留导致的 cuCtxCreate 挂死",
     "用户态安装 .NET 8 SDK（global.json 要求 8.0）到 /root/.dotnet，未污染系统、zero-touch /usr/local/corex"
   ],
-  "terminal_blockers": [
-    "CoreX ivcore11 驱动拒绝 NVIDIA 风格 PTX：ILGPU 生成 .target sm_71/.version 6.5 的 PTX，cuModuleLoadData/cuModuleLoadDataEx 返回 CUDA_ERROR_INVALID_IMAGE(200)、JIT log 空白。裸 C 复现覆盖改 target 到 sm_70、手写最小 PTX（version 6.0/6.5/7.0 × target sm_62/70/72）全部 rc=200。ivcore11 设备镜像由 clang -x ivcore 产出、驱动 JIT 不消费 NV PTX 文本；ILGPU 整个 CUDA 后端架构即「生成 NV PTX→驱动 JIT」，绕过需新增 ivcore11 原生后端（受红线 zero-touch SDK 约束、超出仓库局部适配范围），判定 terminal"
-  ],
-  "workaround_blockers": [
-    "未知 compute capability 7.1 致设备枚举得 0：改 GetMinimumDriverVersion 未知架构回退逻辑后解决，设备被识别为 ISA 6.5 / warpSize 64",
-    "LibDevice 自动探测在 CoreX 部分 nvvm 目录布局下抛 DirectoryNotFoundException 崩溃：加目录判空后解决",
-    "驱动状态残留致 cuCtxCreate_v2 挂死数分钟：每次运行前 ixsmi -r，复位后 0.01s 成功、测试套件 fail-fast 无挂死"
-  ],
   "upstream_assessment": {
     "upstream_status": "blocked",
     "notes": "CoreX CUDA 后端在 ivcore11 因驱动拒收 NV PTX 文本(200)无法加载 kernel,需为 ILGPU 新增 ivcore11 原生后端(超出局部适配、受 zero-touch SDK 红线约束)才能跑通——terminal,CoreX 适配无可用后端可上游。但两处改动(CudaDriverVersion 未知架构回退、Context.Builder LibDevice 目录缺失崩溃)是与 CoreX 无关的通用健壮性修复,NVIDIA 行为不变,已留在 bugfixes[] 可直接单独提 PR。CLA 需签。"

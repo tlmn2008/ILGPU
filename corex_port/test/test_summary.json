@@ -1,32 +1,9 @@
 {
-  "scope": "ILGPU.Tests.Cuda — the CUDA accelerator runtime test suite (migration target). Counts below are the CUDA suite ONLY. The CPU accelerator suite is reported separately under cpu_baseline_metrics with clear scope; it is NOT added into the primary tests_* counts.",
-  "run_command": "dotnet test ILGPU.Tests.Cuda/ILGPU.Tests.Cuda.csproj -c Release --no-build --logger \"trx;LogFileName=cuda.trx\"",
-  "device": "Iluvatar BI-V150 (ivcore11, cc reported 7.1, warpSize=64), 2x visible, CUDA driver 10.2",
   "tests_run": 37999,
   "tests_passed": 186,
   "tests_failed": 37795,
   "tests_skipped": 18,
-  "failure_root_cause": "CoreX ivcore11 driver rejects NVIDIA-style PTX text at cuModuleLoadData -> CUDA_ERROR_INVALID_IMAGE (200). Every kernel-launching test fails identically; the 186 passing tests are non-kernel cases (device/accelerator properties, capability queries, some host-side/allocation paths).",
-  "metrics": [
-    {
-      "name": "CUDA suite pass rate",
-      "metric_type": "pass_rate",
-      "value": 0.0049,
-      "unit": "fraction",
-      "device": "Iluvatar BI-V150 ivcore11",
-      "config": "ILGPU.Tests.Cuda, Debug/O1/O2/Release configs",
-      "source": "corex_port/test/test.log"
-    },
-    {
-      "name": "CPU baseline pass rate (separate scope, not in tests_*)",
-      "metric_type": "pass_rate",
-      "value": 0.9902,
-      "unit": "fraction",
-      "device": "CPU accelerator (ILGPU.Tests.CPU)",
-      "config": "ILGPU.Tests.CPU: 21127 run, 20920 passed, 0 failed, 207 skipped",
-      "source": "corex_port/test/test_cpu_baseline.log"
-    }
-  ],
+  "run_command": "dotnet test ILGPU.Tests.Cuda/ILGPU.Tests.Cuda.csproj -c Release --no-build --logger \"trx;LogFileName=cuda.trx\"",
   "skipped_reasons": [
     {
       "reason": "Skip.If(length > Accelerator.MaxGroupSize.Y) — 3D entry-point tests with length=257 (Index3EntryPoint and its instance/lambda variants across Debug/O2/Release configs)",
@@ -34,5 +11,26 @@
       "legitimate": true,
       "note": "客观硬件约束：3D kernel 的 Y 维长度 257 超过该设备 MaxGroupSize.Y 上限，ILGPU 测试框架用 SkippableTheory 主动跳过。与 CoreX 迁移问题无关，属设备能力边界的合法跳过。"
     }
-  ]
+  ],
+  "metrics": [
+    {
+      "name": "CUDA suite pass rate",
+      "metric_type": "pass_rate",
+      "value": 0.0049,
+      "unit": "fraction",
+      "config": "ILGPU.Tests.Cuda, Debug/O1/O2/Release configs",
+      "device": "Iluvatar BI-V150 ivcore11",
+      "source": "corex_port/test/test.log"
+    },
+    {
+      "name": "CPU baseline pass rate (separate scope, not in tests_*)",
+      "metric_type": "pass_rate",
+      "value": 0.9902,
+      "unit": "fraction",
+      "config": "ILGPU.Tests.CPU: 21127 run, 20920 passed, 0 failed, 207 skipped",
+      "device": "CPU accelerator (ILGPU.Tests.CPU)",
+      "source": "corex_port/test/test_cpu_baseline.log"
+    }
+  ],
+  "notes": "scope: ILGPU.Tests.Cuda — the CUDA accelerator runtime test suite (migration target). Counts below are the CUDA suite ONLY. The CPU accelerator suite is reported separately under cpu_baseline_metrics with clear scope; it is NOT added into the primary tests_* counts.\ndevice: Iluvatar BI-V150 (ivcore11, cc reported 7.1, warpSize=64), 2x visible, CUDA driver 10.2\nfailure_root_cause: CoreX ivcore11 driver rejects NVIDIA-style PTX text at cuModuleLoadData -> CUDA_ERROR_INVALID_IMAGE (200). Every kernel-launching test fails identically; the 186 passing tests are non-kernel cases (device/accelerator properties, capability queries, some host-side/allocation paths)."
 }
