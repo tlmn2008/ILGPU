@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "repo": "ILGPU",
+  "target": "BI-V150",
+  "sdk_version": "CoreX 4.5.0.20260630",
+  "defects": [
+    {
+      "id": "nv-ptx-rejected-by-driver",
+      "defect_key": "driver:nv-ptx-text-rejected",
+      "desc": "把 NVIDIA 风格 PTX 文本(任意 .version/.target)交给 driver API cuModuleLoadData/cuModuleLoadDataEx 做 JIT 加载,驱动一律返回 rc=200(CUDA_ERROR_INVALID_IMAGE),JIT error log 为空。ILGPU 整个 CUDA 后端『生成 NV PTX → 驱动 JIT』,导致几乎所有 kernel 用例失败。",
+      "suspected_component": "driver",
+      "component_detail": "cuModuleLoadData(Ex) 的 PTX 文本 ingestion:ivcore11 驱动只消费本机 native cubin(ELF64),不接受 NV PTX ISA 文本",
+      "confidence": "high",
+      "symptom": "other",
+      "affected_tests": [
+        "ILGPU.Tests.Cuda 全量 37795 个 kernel-launching 用例(Debug/O1/O2/Release 配置)均首错于 cuModuleLoadData rc=200;186 个通过者为不启动 kernel 的属性/能力查询类用例"
+      ],
+      "error": "ILGPU LoadKernel FAILED: CudaException 'device kernel image is invalid at kernelLoaded' / cuModuleLoadDataEx rc=200 (CUDA_ERROR_INVALID_IMAGE), JIT error log empty",
+      "root_cause_hypothesis": "ivcore11 设备代码路径是 clang -x ivcore 产出 ivcore11 native 镜像;驱动 JIT 不消费 NVIDIA PTX 文本(任何 target/version 均拒绝)。这不是仓库局部适配可解(需为 ILGPU 新增产出 ivcore11 native 镜像的全新后端),疑似 SDK 未对『喂入可加载镜像』流程开放,或应至少提供 PTX→native 的 JIT 兼容层。",
+      "evidence": "零依赖裸驱动最小件(defects/reproduce/nv-ptx-rejected/):手写空 kernel 最小 PTX(.version 6.5 .target sm_70)经 cuModuleLoadDataEx 加载,本机实测 rc=200,已复现。对照:ILGPU 生成的 sm_71 PTX、改写 sm_70、多组手写 version/target(6.0/6.5/7.0 × sm_62/70/72)全部 rc=200(build/ptx_load_probe.log)。LuisaCompute 侧同壁垒,但其 JIT 产出的是 IXRTC native cubin 故可绕过;ILGPU 只产 PTX 故无法绕过。",
+      "reproduce": {
+        "path": "corex_port/defects/reproduce/nv-ptx-rejected/",
+        "standalone": true,
+        "build_cmd": "bash build.sh",
+        "run_cmd": "bash run.sh",
+        "expected": "cuModuleLoadDataEx rc=0,合法 NV PTX 空 kernel 应能 JIT 加载",
+        "actual": "cuModuleLoadDataEx rc=200 (CUDA_ERROR_INVALID_IMAGE)"
+      },
+      "blocker_ref": "corex-driver-rejects-nv-ptx",
+      "ref": "iluvatar-cuda-base: cuModuleLoad(NV PTX) 拒绝 / ivcore11 后端不消费 NV PTX 文本"
+    }
+  ],
+  "notes": "ILGPU 只有一条 corex-issue 缺陷但影响面极大(37795/37999 CUDA 用例):驱动不接受 NV PTX 文本。已用零依赖裸驱动件独立复现(rc=200)。其余 blockers 均为已解决 workaround(未知架构回退、libdevice 目录判空、驱动残留复位),不在此升级。"
+}

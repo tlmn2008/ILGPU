@@ -40,6 +40,10 @@
       "status": "fixed_local"
     }
   ],
+  "defects_summary": {
+    "count": 1,
+    "high_confidence": 1
+  },
   "github": {
     "fork_url": "https://github.com/tlmn2008/ILGPU",
     "branch": "corex-port",
